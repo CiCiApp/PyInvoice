@@ -13,3 +13,8 @@ class CodeSnippet(Paragraph):
 
     def __init__(self, code):
         Paragraph.__init__(self, code, self.style)
+
+
+class AddressTable(Table):
+    def __init__(self, data, horizontal_align=None):
+        Table.__init__(self, data, hAlign=horizontal_align)

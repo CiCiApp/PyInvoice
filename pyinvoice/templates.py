@@ -9,8 +9,8 @@ class SimpleInvoice(SimpleDocTemplate):
             self,
             invoice_path,
             pagesize=letter,
-            rightMargin=.25 * inch,
-            leftMargin=.25 * inch,
-            topMargin=.25 * inch,
-            bottomMargin=.25 * inch
+            rightMargin=inch,
+            leftMargin=inch,
+            topMargin=inch,
+            bottomMargin=inch
         )

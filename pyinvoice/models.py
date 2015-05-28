@@ -1,3 +1,11 @@
+class PDFInfo(object):
+    def __init__(self, title, author, subject):
+        self.title = title
+        self.author = author
+        self.subject = subject
+        self.creator = 'pyinvlice (https://ciciapp.com/pyinvoice)'
+
+
 class InvoiceInfo(object):
     """
     Invoice information

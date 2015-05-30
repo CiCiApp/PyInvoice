@@ -1,4 +1,7 @@
-from reportlab.platypus import Paragraph, Table, TableStyle, Flowable
+from reportlab.graphics.charts.textlabels import Label
+from reportlab.graphics.shapes import Drawing
+from reportlab.lib.units import inch
+from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib import colors
 
@@ -31,7 +34,14 @@ class PaidStamp(object):
         self.y = y
 
     def __call__(self, canvas, doc):
-        # TODO: xxx
+        # "PAID"
         canvas.saveState()
+        canvas.setFontSize(50)
+        canvas.setFillColor(colors.red)
+        canvas.setStrokeColor(colors.red)
+        canvas.rotate(45)
         canvas.drawString(self.x, self.y, 'PAID')
+        canvas.setLineWidth(4)
+        canvas.setLineJoin(1)  # Round join
+        canvas.rect(self.x - .25 * inch, self.y - .25 * inch, width=2*inch, height=inch)
         canvas.restoreState()

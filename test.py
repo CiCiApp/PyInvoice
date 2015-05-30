@@ -22,4 +22,4 @@ story.append(merchant_table)
 
 doc = SimpleInvoice('test.pdf')
 
-doc.build(story, onFirstPage=PaidStamp(inch, 10*inch))
+doc.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch))

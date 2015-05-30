@@ -1,9 +1,12 @@
+from __future__ import unicode_literals
+
+
 class PDFInfo(object):
-    def __init__(self, title, author, subject):
+    def __init__(self, title=None, author=None, subject=None):
         self.title = title
         self.author = author
         self.subject = subject
-        self.creator = 'pyinvlice (https://ciciapp.com/pyinvoice)'
+        self.creator = 'PyInvoice (https://ciciapp.com/pyinvoice)'
 
 
 class InvoiceInfo(object):

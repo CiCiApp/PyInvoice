@@ -25,7 +25,7 @@ class SimpleTable(Table):
     ])
 
     def __init__(self, data, horizontal_align=None):
-        Table.__init__(self, data, style=self.style, hAlign=horizontal_align)
+        Table.__init__(self, data, hAlign=horizontal_align)
 
 
 class PaidStamp(object):

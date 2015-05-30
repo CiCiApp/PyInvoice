@@ -1,25 +1,28 @@
-from reportlab.lib.units import inch
-from pyinvoice.components import SimpleTable, PaidStamp
+from datetime import datetime
+from pyinvoice.models import InvoiceInfo, ServiceProviderInfo, ClientInfo
 from pyinvoice.templates import SimpleInvoice
 
-story = []
-
-address_table = SimpleTable([
-    ['Name', 'zhangshine'],
-    ['City', 'Jining'],
-    ['City', 'Jining'],
-    ['City', 'Jining'],
-    ['City', 'Jining'],
-    ['City', 'Jining']
-], horizontal_align='RIGHT')
-story.append(address_table)
-
-merchant_table = SimpleTable([
-    ['Name', 'CiCiApp'],
-    ['xxxx', 'yyyy']
-], horizontal_align='LEFT')
-story.append(merchant_table)
-
 doc = SimpleInvoice('test.pdf')
+doc.invoice_info = InvoiceInfo('1024', datetime.now(), datetime.now())
+doc.service_provider_info = ServiceProviderInfo(
+    name='PyInvoice',
+    street='My Street',
+    city='My City',
+    state='My State',
+    country='My Country',
+    post_code='My Post code'
+)
 
-doc.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch))
+doc.client_info = ClientInfo(
+    email='My Email',
+    client_id='My Client Id',
+    name='Client Name',
+    street='Client Street',
+    city='Client City',
+    state='Client State',
+    country='Client country',
+    post_code='Client Post code'
+)
+
+# doc.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch))
+doc.finish()

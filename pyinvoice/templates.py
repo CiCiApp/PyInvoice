@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 from datetime import datetime, date
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate
-from pyinvoice.components import SimpleTable
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from pyinvoice.components import SimpleTable, TableWithHeader
 from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
 
 
@@ -86,5 +88,23 @@ class SimpleInvoice(SimpleDocTemplate):
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
             story.append(SimpleTable(self.__attribute_to_table_data(self.client_info, props), horizontal_align='LEFT'))
+
+        item_table_paragraph_style = ParagraphStyle(
+            'ItemTableParagraph',
+            parent=getSampleStyleSheet()['Normal'],
+            alignment=TA_CENTER
+        )
+
+        item_data = [(
+            item.item_id,
+            item.name,
+            Paragraph(item.description, item_table_paragraph_style),
+            item.units,
+            item.unit_price,
+            item.subtotal
+        ) for item in self._items if isinstance(item, Item)]
+        if item_data:
+            item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
+            story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
 
         self.build(story)

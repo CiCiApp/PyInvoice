@@ -1,5 +1,3 @@
-from reportlab.graphics.charts.textlabels import Label
-from reportlab.graphics.shapes import Drawing
 from reportlab.lib.units import inch
 from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -19,13 +17,22 @@ class CodeSnippet(Paragraph):
 
 
 class SimpleTable(Table):
-    style = TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), .25, colors.black),
-        ('BOX', (0, 0), (-1, -1), .25, colors.black),
-    ])
-
     def __init__(self, data, horizontal_align=None):
         Table.__init__(self, data, hAlign=horizontal_align)
+
+
+class TableWithHeader(Table):
+    def __init__(self, data, horizontal_align=None):
+        Table.__init__(self, data, hAlign=horizontal_align)
+
+        style = TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), .25, colors.black),
+            ('BOX', (0, 0), (-1, -1), .25, colors.black),
+            ('BACKGROUND', (0, 0), (-1, -len(data)), colors.lightgrey),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+        ])
+        self.setStyle(style)
 
 
 class PaidStamp(object):

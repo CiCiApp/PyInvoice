@@ -1,7 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
+
 from pyinvoice.models import InvoiceInfo, ServiceProviderInfo, ClientInfo, Item, Transaction
 from pyinvoice.templates import SimpleInvoice
+
 
 doc = SimpleInvoice('test.pdf')
 

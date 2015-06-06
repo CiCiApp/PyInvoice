@@ -2,6 +2,9 @@ from __future__ import unicode_literals
 
 
 class PDFInfo(object):
+    """
+    PDF Properties
+    """
     def __init__(self, title=None, author=None, subject=None):
         self.title = title
         self.author = author
@@ -77,6 +80,13 @@ class Transaction(object):
     Transaction information
     """
     def __init__(self, gateway, transaction_id, transaction_datetime, amount):
+        """
+        :param gateway: Payment gateway like Paypal, Stripe etc.
+        :param transaction_id:
+        :param transaction_datetime:
+        :param amount: $$
+        :return:
+        """
         self.gateway = gateway
         self.transaction_id = transaction_id
         self.transaction_datetime = transaction_datetime

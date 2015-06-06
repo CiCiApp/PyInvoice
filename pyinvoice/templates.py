@@ -51,17 +51,21 @@ class SimpleInvoice(SimpleDocTemplate):
             self._transactions.append(t)
 
     @staticmethod
-    def __attribute_to_table_data(instance, attribute_verbose_name_list):
+    def __format_value(value):
+        if isinstance(value, datetime):
+            value = value.strftime('%Y-%m-%d %H:%M')
+        elif isinstance(value, date):
+            value = value.strftime('%Y-%m-%d')
+        return value
+
+    def __attribute_to_table_data(self, instance, attribute_verbose_name_list):
         data = []
 
-        for p, v in attribute_verbose_name_list:
-            attr = getattr(instance, p)
-            if attr is not None:
-                if isinstance(attr, datetime):
-                    attr = attr.strftime('%Y-%m-%d %H:%M')
-                elif isinstance(attr, date):
-                    attr = attr.strftime('%Y-%m-%d')
-                data.append(['{0}:'.format(v), attr])
+        for property_name, verbose_name in attribute_verbose_name_list:
+            attr = getattr(instance, property_name)
+            if attr:
+                attr = self.__format_value(attr)
+                data.append(['{0}:'.format(verbose_name), attr])
 
         return data
 
@@ -84,11 +88,13 @@ class SimpleInvoice(SimpleDocTemplate):
                 SimpleTable(self.__attribute_to_table_data(self.service_provider_info, props), horizontal_align='RIGHT')
             )
 
+        # ClientInfo
         if isinstance(self.client_info, ClientInfo):
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
             story.append(SimpleTable(self.__attribute_to_table_data(self.client_info, props), horizontal_align='LEFT'))
 
+        # Items
         item_table_paragraph_style = ParagraphStyle(
             'ItemTableParagraph',
             parent=getSampleStyleSheet()['Normal'],
@@ -106,5 +112,16 @@ class SimpleInvoice(SimpleDocTemplate):
         if item_data:
             item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
             story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
+
+        # Transaction
+        transaction_table_data = [(
+            t.transaction_id,
+            t.gateway,
+            self.__format_value(t.transaction_datetime),
+            t.amount
+        ) for t in self._transactions if isinstance(t, Transaction)]
+        if transaction_table_data:
+            transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
+            story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 
         self.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch) if self.is_paid else None)

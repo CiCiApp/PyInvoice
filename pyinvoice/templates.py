@@ -33,6 +33,7 @@ class SimpleInvoice(SimpleDocTemplate):
         self.is_paid = False
         self._items = []
         self._transactions = []
+        self._story = []
 
     @property
     def items(self):
@@ -69,31 +70,34 @@ class SimpleInvoice(SimpleDocTemplate):
 
         return data
 
-    def finish(self):
-        story = []
-
+    def __build_invoice_info(self):
         if isinstance(self.invoice_info, InvoiceInfo):
             props = [('invoice_id', 'Invoice id'), ('invoice_datetime', 'Invoice date'),
                      ('due_datetime', 'Invoice due date')]
 
-            story.append(
+            self._story.append(
                 SimpleTable(self.__attribute_to_table_data(self.invoice_info, props), horizontal_align='LEFT')
             )
 
+    def __build_service_provider_info(self):
         if isinstance(self.service_provider_info, ServiceProviderInfo):
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code')]
 
-            story.append(
+            self._story.append(
                 SimpleTable(self.__attribute_to_table_data(self.service_provider_info, props), horizontal_align='RIGHT')
             )
 
+    def __build_client_info(self):
         # ClientInfo
         if isinstance(self.client_info, ClientInfo):
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
-            story.append(SimpleTable(self.__attribute_to_table_data(self.client_info, props), horizontal_align='LEFT'))
+            self._story.append(
+                SimpleTable(self.__attribute_to_table_data(self.client_info, props), horizontal_align='LEFT')
+            )
 
+    def __build_items(self):
         # Items
         item_table_paragraph_style = ParagraphStyle(
             'ItemTableParagraph',
@@ -101,27 +105,43 @@ class SimpleInvoice(SimpleDocTemplate):
             alignment=TA_CENTER
         )
 
-        item_data = [(
-            item.item_id,
-            item.name,
-            Paragraph(item.description, item_table_paragraph_style),
-            item.units,
-            item.unit_price,
-            item.subtotal
-        ) for item in self._items if isinstance(item, Item)]
+        item_data = [
+            (
+                item.item_id,
+                item.name,
+                Paragraph(item.description, item_table_paragraph_style),
+                item.units,
+                item.unit_price,
+                item.subtotal
+            ) for item in self._items if isinstance(item, Item)
+        ]
+
         if item_data:
             item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
-            story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
+            self._story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
 
+    def __build_transactions(self):
         # Transaction
-        transaction_table_data = [(
-            t.transaction_id,
-            t.gateway,
-            self.__format_value(t.transaction_datetime),
-            t.amount
-        ) for t in self._transactions if isinstance(t, Transaction)]
+        transaction_table_data = [
+            (
+                t.transaction_id,
+                t.gateway,
+                self.__format_value(t.transaction_datetime),
+                t.amount
+            ) for t in self._transactions if isinstance(t, Transaction)
+        ]
+
         if transaction_table_data:
             transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
-            story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
+            self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 
-        self.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch) if self.is_paid else None)
+    def finish(self):
+        self._story = []
+
+        self.__build_invoice_info()
+        self.__build_service_provider_info()
+        self.__build_client_info()
+        self.__build_items()
+        self.__build_transactions()
+
+        self.build(self._story, onFirstPage=PaidStamp(7 * inch, 5.8 * inch) if self.is_paid else None)

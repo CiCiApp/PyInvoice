@@ -5,6 +5,8 @@ from pyinvoice.templates import SimpleInvoice
 
 doc = SimpleInvoice('test.pdf')
 
+doc.is_paid = True
+
 doc.invoice_info = InvoiceInfo('1024', datetime.now(), datetime.now())
 
 doc.service_provider_info = ServiceProviderInfo(
@@ -31,5 +33,4 @@ doc.add_item(Item('0000', 'Item 0000', 'Item Description 1 Long-----------------
 doc.add_item(Item('1111', 'Item 1111', 'Item Description 2', 2, Decimal('2.2')))
 doc.add_item(Item('2222', 'Item 2222', 'Item Description 3', 3, Decimal('3.3')))
 
-# doc.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch))
 doc.finish()

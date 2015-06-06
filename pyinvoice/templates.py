@@ -5,7 +5,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph
-from pyinvoice.components import SimpleTable, TableWithHeader
+from pyinvoice.components import SimpleTable, TableWithHeader, PaidStamp
 from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
 
 
@@ -30,6 +30,7 @@ class SimpleInvoice(SimpleDocTemplate):
         self.invoice_info = None
         self.service_provider_info = None
         self.client_info = None
+        self.is_paid = False
         self._items = []
         self._transactions = []
 
@@ -56,7 +57,6 @@ class SimpleInvoice(SimpleDocTemplate):
         for p, v in attribute_verbose_name_list:
             attr = getattr(instance, p)
             if attr is not None:
-                # TODO: datetime format
                 if isinstance(attr, datetime):
                     attr = attr.strftime('%Y-%m-%d %H:%M')
                 elif isinstance(attr, date):
@@ -107,4 +107,4 @@ class SimpleInvoice(SimpleDocTemplate):
             item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
             story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
 
-        self.build(story)
+        self.build(story, onFirstPage=PaidStamp(7*inch, 5.8*inch) if self.is_paid else None)

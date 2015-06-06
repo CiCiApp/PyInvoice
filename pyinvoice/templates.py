@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from datetime import datetime, date
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -25,6 +25,14 @@ class SimpleInvoice(SimpleDocTemplate):
             topMargin=inch,
             bottomMargin=inch,
             **pdf_info.__dict__
+        )
+
+        self._defined_styles = getSampleStyleSheet()
+        self._defined_styles.add(
+            ParagraphStyle('RightHeading1', parent=self._defined_styles.get('Heading1'), alignment=TA_RIGHT)
+        )
+        self._defined_styles.add(
+            ParagraphStyle('ItemTableParagraph', parent=self._defined_styles.get('Normal'), alignment=TA_CENTER)
         )
 
         self.invoice_info = None
@@ -72,6 +80,10 @@ class SimpleInvoice(SimpleDocTemplate):
 
     def __build_invoice_info(self):
         if isinstance(self.invoice_info, InvoiceInfo):
+            self._story.append(
+                Paragraph('Invoice', self._defined_styles.get('Heading1'))
+            )
+
             props = [('invoice_id', 'Invoice id'), ('invoice_datetime', 'Invoice date'),
                      ('due_datetime', 'Invoice due date')]
 
@@ -81,6 +93,10 @@ class SimpleInvoice(SimpleDocTemplate):
 
     def __build_service_provider_info(self):
         if isinstance(self.service_provider_info, ServiceProviderInfo):
+            self._story.append(
+                Paragraph('Merchant', self._defined_styles.get('RightHeading1'))
+            )
+
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code')]
 
@@ -91,6 +107,10 @@ class SimpleInvoice(SimpleDocTemplate):
     def __build_client_info(self):
         # ClientInfo
         if isinstance(self.client_info, ClientInfo):
+            self._story.append(
+                Paragraph('Client', self._defined_styles.get('Heading1'))
+            )
+
             props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                      ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
             self._story.append(
@@ -99,17 +119,11 @@ class SimpleInvoice(SimpleDocTemplate):
 
     def __build_items(self):
         # Items
-        item_table_paragraph_style = ParagraphStyle(
-            'ItemTableParagraph',
-            parent=getSampleStyleSheet()['Normal'],
-            alignment=TA_CENTER
-        )
-
         item_data = [
             (
                 item.item_id,
                 item.name,
-                Paragraph(item.description, item_table_paragraph_style),
+                Paragraph(item.description, self._defined_styles.get('ItemTableParagraph')),
                 item.units,
                 item.unit_price,
                 item.subtotal
@@ -117,6 +131,9 @@ class SimpleInvoice(SimpleDocTemplate):
         ]
 
         if item_data:
+            self._story.append(
+                Paragraph('Detail', self._defined_styles.get('Heading1'))
+            )
             item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
             self._story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
 
@@ -132,6 +149,9 @@ class SimpleInvoice(SimpleDocTemplate):
         ]
 
         if transaction_table_data:
+            self._story.append(
+                Paragraph('Transaction', self._defined_styles.get('Heading1'))
+            )
             transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
             self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 

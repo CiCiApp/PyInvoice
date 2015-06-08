@@ -36,8 +36,9 @@ class ServiceProviderInfo(AddressInfo):
     """
     Service provider/Merchant information
     """
-    def __init__(self, name, street, city, state, country, post_code):
+    def __init__(self, name, street, city, state, country, post_code, vat_tax_number=None):
         super(ServiceProviderInfo, self).__init__(name, street, city, state, country, post_code)
+        self.vat_tax_number = vat_tax_number
 
 
 class ClientInfo(AddressInfo):

@@ -4,7 +4,7 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table
 
 from pyinvoice.components import SimpleTable, TableWithHeader, PaidStamp
 from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
@@ -92,18 +92,27 @@ class SimpleInvoice(SimpleDocTemplate):
                 SimpleTable(self.__attribute_to_table_data(self.invoice_info, props), horizontal_align='RIGHT')
             )
 
+    def __service_provider_data(self):
+        props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
+                 ('country', 'Country'), ('post_code', 'Post code'), ('vat_tax_number', 'Vat/Tax number')]
+
+        return self.__attribute_to_table_data(self.service_provider_info, props)
+
     def __build_service_provider_info(self):
+        # Merchant
         if isinstance(self.service_provider_info, ServiceProviderInfo):
             self._story.append(
                 Paragraph('Merchant', self._defined_styles.get('RightHeading1'))
             )
 
-            props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                     ('country', 'Country'), ('post_code', 'Post code')]
-
             self._story.append(
-                SimpleTable(self.__attribute_to_table_data(self.service_provider_info, props), horizontal_align='RIGHT')
+                SimpleTable(self.__service_provider_data(), horizontal_align='RIGHT')
             )
+
+    def __client_info_data(self):
+        props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
+                 ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
+        return self.__attribute_to_table_data(self.client_info, props)
 
     def __build_client_info(self):
         # ClientInfo
@@ -112,11 +121,37 @@ class SimpleInvoice(SimpleDocTemplate):
                 Paragraph('Client', self._defined_styles.get('Heading1'))
             )
 
-            props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                     ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
             self._story.append(
-                SimpleTable(self.__attribute_to_table_data(self.client_info, props), horizontal_align='LEFT')
+                SimpleTable(self.__client_info_data(), horizontal_align='LEFT')
             )
+
+    def __build_service_provider_and_client_info(self):
+        if isinstance(self.service_provider_info, ServiceProviderInfo) and isinstance(self.client_info, ClientInfo):
+            # Merge Table
+            table_data = [
+                [Paragraph('Service Provider', self._defined_styles.get('Heading1')), '', Paragraph('Client', self._defined_styles.get('Heading1')), '']
+            ]
+            table_style = [
+                ('SPAN', (0, 0), (1, 0)),
+                ('SPAN', (2, 0), (3, 0)),
+            ]
+            client_info_data = self.__client_info_data()
+            service_provider_data = self.__service_provider_data()
+            diff = abs(len(client_info_data) - len(service_provider_data))
+            if diff > 0:
+                if len(client_info_data) < len(service_provider_data):
+                    client_info_data.extend([["", ""]]*diff)
+                else:
+                    service_provider_data.extend([["", ""]*diff])
+            for d in zip(service_provider_data, client_info_data):
+                d[0].extend(d[1])
+                table_data.append(d[0])
+            self._story.append(
+                Table(table_data, style=table_style)
+            )
+        else:
+            self.__build_service_provider_info()
+            self.__build_client_info()
 
     def __build_items(self):
         # Items
@@ -160,8 +195,7 @@ class SimpleInvoice(SimpleDocTemplate):
         self._story = []
 
         self.__build_invoice_info()
-        self.__build_service_provider_info()
-        self.__build_client_info()
+        self.__build_service_provider_and_client_info()
         self.__build_items()
         self.__build_transactions()
 

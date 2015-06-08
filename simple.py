@@ -17,7 +17,8 @@ doc.service_provider_info = ServiceProviderInfo(
     city='My City',
     state='My State',
     country='My Country',
-    post_code='222222'
+    post_code='222222',
+    vat_tax_number='Vat/Tax number'
 )
 
 doc.client_info = ClientInfo(
@@ -31,7 +32,7 @@ doc.client_info = ClientInfo(
     post_code='222222'
 )
 
-doc.add_item(Item('0000', 'Item 0000', 'Item Description 1 Long--------------------------------Item Description 1 Long', 1, Decimal('1.1')))
+doc.add_item(Item('0000', 'Item 0000', 'Item Description 1', 1, Decimal('1.1')))
 doc.add_item(Item('1111', 'Item 1111', 'Item Description 2', 2, Decimal('2.2')))
 doc.add_item(Item('2222', 'Item 2222', 'Item Description 3', 3, Decimal('3.3')))
 

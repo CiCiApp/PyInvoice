@@ -167,6 +167,7 @@ class SimpleInvoice(SimpleDocTemplate):
                 Paragraph(item.description, self._defined_styles.get('TableParagraph')),
                 item.units,
                 item.unit_price,
+                item.vat_tax if item.vat_tax is not None else '-',
                 item.subtotal
             ) for item in self._items if isinstance(item, Item)
         ]
@@ -175,7 +176,7 @@ class SimpleInvoice(SimpleDocTemplate):
             self._story.append(
                 Paragraph('Detail', self._defined_styles.get('Heading1'))
             )
-            item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Subtotal'))
+            item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Vat/Tax', 'Subtotal'))
             self._story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
 
     def __build_transactions(self):

@@ -55,7 +55,7 @@ class Item(object):
     """
     Product/Item information
     """
-    def __init__(self, item_id, name, description, units, unit_price):
+    def __init__(self, item_id, name, description, units, unit_price, subtotal, vat_tax=None):
         """
         Item modal init
         :param item_id: Order id or Item id
@@ -70,10 +70,8 @@ class Item(object):
         self.description = description
         self.units = units
         self.unit_price = unit_price
-
-    @property
-    def subtotal(self):
-        return int(self.units) * self.unit_price
+        self.vat_tax = vat_tax
+        self.subtotal = subtotal
 
 
 class Transaction(object):

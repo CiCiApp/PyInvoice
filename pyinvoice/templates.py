@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from datetime import datetime, date
+from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -33,7 +34,7 @@ class SimpleInvoice(SimpleDocTemplate):
             ParagraphStyle('RightHeading1', parent=self._defined_styles.get('Heading1'), alignment=TA_RIGHT)
         )
         self._defined_styles.add(
-            ParagraphStyle('ItemTableParagraph', parent=self._defined_styles.get('Normal'), alignment=TA_CENTER)
+            ParagraphStyle('TableParagraph', parent=self._defined_styles.get('Normal'), alignment=TA_CENTER)
         )
 
         self.invoice_info = None
@@ -129,11 +130,14 @@ class SimpleInvoice(SimpleDocTemplate):
         if isinstance(self.service_provider_info, ServiceProviderInfo) and isinstance(self.client_info, ClientInfo):
             # Merge Table
             table_data = [
-                [Paragraph('Service Provider', self._defined_styles.get('Heading1')), '', Paragraph('Client', self._defined_styles.get('Heading1')), '']
+                [Paragraph('Service Provider', self._defined_styles.get('Heading1')), '', '', Paragraph('Client', self._defined_styles.get('Heading1')), '']
             ]
             table_style = [
                 ('SPAN', (0, 0), (1, 0)),
-                ('SPAN', (2, 0), (3, 0)),
+                ('SPAN', (3, 0), (4, 0)),
+                ('LINEBELOW', (0, 0), (1, 0), 1, colors.gray),
+                ('LINEBELOW', (3, 0), (4, 0), 1, colors.gray),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ]
             client_info_data = self.__client_info_data()
             service_provider_data = self.__service_provider_data()
@@ -144,6 +148,7 @@ class SimpleInvoice(SimpleDocTemplate):
                 else:
                     service_provider_data.extend([["", ""]*diff])
             for d in zip(service_provider_data, client_info_data):
+                d[0].append('')
                 d[0].extend(d[1])
                 table_data.append(d[0])
             self._story.append(
@@ -159,7 +164,7 @@ class SimpleInvoice(SimpleDocTemplate):
             (
                 item.item_id,
                 item.name,
-                Paragraph(item.description, self._defined_styles.get('ItemTableParagraph')),
+                Paragraph(item.description, self._defined_styles.get('TableParagraph')),
                 item.units,
                 item.unit_price,
                 item.subtotal
@@ -178,9 +183,9 @@ class SimpleInvoice(SimpleDocTemplate):
         transaction_table_data = [
             (
                 t.transaction_id,
-                t.gateway,
+                Paragraph(t.gateway, self._defined_styles.get('TableParagraph')),
                 self.__format_value(t.transaction_datetime),
-                t.amount
+                t.amount,
             ) for t in self._transactions if isinstance(t, Transaction)
         ]
 

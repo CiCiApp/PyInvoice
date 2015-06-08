@@ -17,7 +17,7 @@ doc.service_provider_info = ServiceProviderInfo(
     city='My City',
     state='My State',
     country='My Country',
-    post_code='My Post code'
+    post_code='222222'
 )
 
 doc.client_info = ClientInfo(
@@ -28,7 +28,7 @@ doc.client_info = ClientInfo(
     city='Client City',
     state='Client State',
     country='Client country',
-    post_code='Client Post code'
+    post_code='222222'
 )
 
 doc.add_item(Item('0000', 'Item 0000', 'Item Description 1 Long--------------------------------Item Description 1 Long', 1, Decimal('1.1')))

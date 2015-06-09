@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 from datetime import datetime, date
 from decimal import Decimal
+
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, Spacer
 
 from pyinvoice.components import SimpleTable, TableWithHeader, PaidStamp
 from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
@@ -46,6 +47,8 @@ class SimpleInvoice(SimpleDocTemplate):
         self._item_tax_rate = None
         self._transactions = []
         self._story = []
+        self._bottom_tip = None
+        self._bottom_tip_align = None
 
     @property
     def items(self):
@@ -65,6 +68,10 @@ class SimpleInvoice(SimpleDocTemplate):
     def add_transaction(self, t):
         if isinstance(t, Transaction):
             self._transactions.append(t)
+
+    def set_bottom_tip(self, text, align=TA_CENTER):
+        self._bottom_tip = text
+        self._bottom_tip_align = align
 
     @staticmethod
     def __format_value(value):
@@ -244,6 +251,20 @@ class SimpleInvoice(SimpleDocTemplate):
             transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
             self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 
+    def __build_bottom_tip(self):
+        if self._bottom_tip:
+            self._story.append(Spacer(5, 5))
+            self._story.append(
+                Paragraph(
+                    self._bottom_tip,
+                    ParagraphStyle(
+                        'BottomTip',
+                        parent=self._defined_styles.get('Normal'),
+                        alignment=self._bottom_tip_align
+                    )
+                )
+            )
+
     def finish(self):
         self._story = []
 
@@ -251,5 +272,6 @@ class SimpleInvoice(SimpleDocTemplate):
         self.__build_service_provider_and_client_info()
         self.__build_items()
         self.__build_transactions()
+        self.__build_bottom_tip()
 
         self.build(self._story, onFirstPage=PaidStamp(7 * inch, 5.8 * inch) if self.is_paid else None)

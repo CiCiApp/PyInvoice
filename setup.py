@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup, Extension, Command
+from setuptools import setup
 import os
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:

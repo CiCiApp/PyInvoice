@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from datetime import datetime, date
+from decimal import Decimal
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import letter
@@ -42,8 +43,7 @@ class SimpleInvoice(SimpleDocTemplate):
         self.client_info = None
         self.is_paid = False
         self._items = []
-        self.item_tax_total = None
-        self.item_total = None
+        self._item_tax_rate = None
         self._transactions = []
         self._story = []
 
@@ -54,6 +54,9 @@ class SimpleInvoice(SimpleDocTemplate):
     def add_item(self, item):
         if isinstance(item, Item):
             self._items.append(item)
+
+    def set_item_tax_rate(self, rate):
+        self._item_tax_rate = rate
 
     @property
     def transactions(self):
@@ -162,37 +165,65 @@ class SimpleInvoice(SimpleDocTemplate):
 
     def __build_items(self):
         # Items
-        item_data = [
-            (
-                item.item_id,
-                item.name,
-                Paragraph(item.description, self._defined_styles.get('TableParagraph')),
-                item.units,
-                item.unit_price,
-                item.vat_tax if item.vat_tax is not None else '-',
-                item.subtotal
-            ) for item in self._items if isinstance(item, Item)
-        ]
+        item_data = []
+        item_subtotal = 0
+
+        for item in self._items:
+            if not isinstance(item, Item):
+                continue
+
+            item_data.append(
+                (
+                    item.name,
+                    Paragraph(item.description, self._defined_styles.get('TableParagraph')),
+                    item.units,
+                    item.unit_price,
+                    item.amount
+                )
+            )
+            item_subtotal += item.amount
 
         if item_data:
             self._story.append(
                 Paragraph('Detail', self._defined_styles.get('Heading1'))
             )
-            item_data.insert(0, ('#', 'Name', 'Description', 'Units', 'Unit Price', 'Vat/Tax', 'Subtotal'))
-            if self.item_tax_total or self.item_total:
+
+            item_data_title = ('Name', 'Description', 'Units', 'Unit Price', 'Amount')
+            item_data.insert(0, item_data_title)  # Insert title
+
+            # Summary field
+            sum_start_y_index = len(item_data)
+            sum_end_x_index = -1 - 1
+            sum_start_x_index = len(item_data_title) - abs(sum_end_x_index)
+            style = []
+
+            # ##### Subtotal #####
+            item_data.append(
+                ('Subtotal', '', '', '', item_subtotal)
+            )
+
+            style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
+            style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
+
+            # Tax total
+            if self._item_tax_rate is not None:
+                tax_total = item_subtotal * (Decimal(str(self._item_tax_rate)) / Decimal('100'))
                 item_data.append(
-                    (
-                        'Total', '', '', '', '',
-                        self.item_tax_total if self.item_tax_total else '-',
-                        self.item_total if self.item_total else '-'
-                    )
+                    ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', tax_total)
                 )
-                style = [
-                    ('SPAN', (0, len(item_data) - 1), (4, len(item_data) - 1)),
-                    ('ALIGN', (0, len(item_data) - 1), (-3, -1), 'RIGHT'),
-                ]
+                sum_start_y_index += 1
+                style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
+                style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
             else:
-                style = None
+                tax_total = None
+
+            # Total
+            total = item_subtotal + tax_total if tax_total else Decimal('0')
+            item_data.append(('Total', '', '', '', total))
+            sum_start_y_index += 1
+            style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
+            style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
+
             self._story.append(TableWithHeader(item_data, horizontal_align='LEFT', style=style))
 
     def __build_transactions(self):

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from decimal import Decimal
 
 
 class PDFInfo(object):
@@ -55,22 +56,22 @@ class Item(object):
     """
     Product/Item information
     """
-    def __init__(self, item_id, name, description, units, unit_price, subtotal, vat_tax=None):
+    def __init__(self, name, description, units, unit_price):
         """
         Item modal init
-        :param item_id: Order id or Item id
         :param name: Item name
         :param units: Amount
         :param unit_price: Unit price
         :return:
         """
-        self.item_id = item_id
         self.name = name
         self.description = description
         self.units = units
         self.unit_price = unit_price
-        self.vat_tax = vat_tax
-        self.subtotal = subtotal
+
+    @property
+    def amount(self):
+        return int(self.units) * Decimal(self.unit_price)
 
 
 class Transaction(object):

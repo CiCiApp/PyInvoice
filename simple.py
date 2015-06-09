@@ -32,9 +32,11 @@ doc.client_info = ClientInfo(
     post_code='222222'
 )
 
-doc.add_item(Item('0000', 'Item', 'Item', 1, '1.1', '1.1'))
+doc.add_item(Item('0000', 'Item', 'Item', 1, '1.1', '1.32', '0.22'))
 doc.add_item(Item('1111', 'Item', 'Item', 2, '2.2', '4.4'))
 doc.add_item(Item('2222', 'Item', 'Item', 3, '3.3', '9.9'))
+doc.item_tax_total = Decimal('.22')
+doc.item_total = Decimal('16.2')
 
 doc.add_transaction(Transaction('Paypal', 111, datetime.now(), 1))
 doc.add_transaction(Transaction('Strip', 222, datetime.now(), 2))

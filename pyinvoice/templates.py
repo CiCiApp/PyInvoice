@@ -42,6 +42,8 @@ class SimpleInvoice(SimpleDocTemplate):
         self.client_info = None
         self.is_paid = False
         self._items = []
+        self.item_tax_total = None
+        self.item_total = None
         self._transactions = []
         self._story = []
 
@@ -176,8 +178,22 @@ class SimpleInvoice(SimpleDocTemplate):
             self._story.append(
                 Paragraph('Detail', self._defined_styles.get('Heading1'))
             )
-            item_data.insert(0, ('Item id', 'Name', 'Description', 'Units', 'Unit Price', 'Vat/Tax', 'Subtotal'))
-            self._story.append(TableWithHeader(item_data, horizontal_align='LEFT'))
+            item_data.insert(0, ('#', 'Name', 'Description', 'Units', 'Unit Price', 'Vat/Tax', 'Subtotal'))
+            if self.item_tax_total or self.item_total:
+                item_data.append(
+                    (
+                        'Total', '', '', '', '',
+                        self.item_tax_total if self.item_tax_total else '-',
+                        self.item_total if self.item_total else '-'
+                    )
+                )
+                style = [
+                    ('SPAN', (0, len(item_data) - 1), (4, len(item_data) - 1)),
+                    ('ALIGN', (0, len(item_data) - 1), (-3, -1), 'RIGHT'),
+                ]
+            else:
+                style = None
+            self._story.append(TableWithHeader(item_data, horizontal_align='LEFT', style=style))
 
     def __build_transactions(self):
         # Transaction

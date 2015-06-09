@@ -64,7 +64,6 @@ class Item(object):
         :param unit_price: Unit price
         :return:
         """
-        # TODO: add vat/tax, subtotal
         self.item_id = item_id
         self.name = name
         self.description = description

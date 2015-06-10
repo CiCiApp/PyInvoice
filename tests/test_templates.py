@@ -12,11 +12,15 @@ class TestSimpleInvoice(unittest.TestCase):
 
     def test_simple(self):
         invoice_path = os.path.join(self.file_base_dir, 'fixtures/dist/simple.pdf')
+
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
         doc = SimpleInvoice(invoice_path)
 
         doc.is_paid = True
 
-        doc.invoice_info = InvoiceInfo('1024', datetime.now(), datetime.now())
+        doc.invoice_info = InvoiceInfo(1023, datetime.now(), datetime.now())
 
         doc.service_provider_info = ServiceProviderInfo(
             name='PyInvoice',
@@ -28,16 +32,7 @@ class TestSimpleInvoice(unittest.TestCase):
             vat_tax_number='Vat/Tax number'
         )
 
-        doc.client_info = ClientInfo(
-            email='My Email',
-            client_id='My Client Id',
-            name='Client Name',
-            street='Client Street',
-            city='Client City',
-            state='Client State',
-            country='Client country',
-            post_code='222222'
-        )
+        doc.client_info = ClientInfo(email='client@example.com')
 
         doc.add_item(Item('Item', 'Item desc', 1, '1.1'))
         doc.add_item(Item('Item', 'Item desc', 2, '2.2'))

@@ -74,25 +74,25 @@ class SimpleInvoice(SimpleDocTemplate):
         self._bottom_tip_align = align
 
     @staticmethod
-    def __format_value(value):
+    def _format_value(value):
         if isinstance(value, datetime):
             value = value.strftime('%Y-%m-%d %H:%M')
         elif isinstance(value, date):
             value = value.strftime('%Y-%m-%d')
         return value
 
-    def __attribute_to_table_data(self, instance, attribute_verbose_name_list):
+    def _attribute_to_table_data(self, instance, attribute_verbose_name_list):
         data = []
 
         for property_name, verbose_name in attribute_verbose_name_list:
             attr = getattr(instance, property_name)
             if attr:
-                attr = self.__format_value(attr)
+                attr = self._format_value(attr)
                 data.append(['{0}:'.format(verbose_name), attr])
 
         return data
 
-    def __build_invoice_info(self):
+    def _build_invoice_info(self):
         if isinstance(self.invoice_info, InvoiceInfo):
             self._story.append(
                 Paragraph('Invoice', self._defined_styles.get('RightHeading1'))
@@ -102,16 +102,16 @@ class SimpleInvoice(SimpleDocTemplate):
                      ('due_datetime', 'Invoice due date')]
 
             self._story.append(
-                SimpleTable(self.__attribute_to_table_data(self.invoice_info, props), horizontal_align='RIGHT')
+                SimpleTable(self._attribute_to_table_data(self.invoice_info, props), horizontal_align='RIGHT')
             )
 
-    def __service_provider_data(self):
+    def _service_provider_data(self):
         props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                  ('country', 'Country'), ('post_code', 'Post code'), ('vat_tax_number', 'Vat/Tax number')]
 
-        return self.__attribute_to_table_data(self.service_provider_info, props)
+        return self._attribute_to_table_data(self.service_provider_info, props)
 
-    def __build_service_provider_info(self):
+    def _build_service_provider_info(self):
         # Merchant
         if isinstance(self.service_provider_info, ServiceProviderInfo):
             self._story.append(
@@ -119,15 +119,15 @@ class SimpleInvoice(SimpleDocTemplate):
             )
 
             self._story.append(
-                SimpleTable(self.__service_provider_data(), horizontal_align='RIGHT')
+                SimpleTable(self._service_provider_data(), horizontal_align='RIGHT')
             )
 
-    def __client_info_data(self):
+    def _client_info_data(self):
         props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                  ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
-        return self.__attribute_to_table_data(self.client_info, props)
+        return self._attribute_to_table_data(self.client_info, props)
 
-    def __build_client_info(self):
+    def _build_client_info(self):
         # ClientInfo
         if isinstance(self.client_info, ClientInfo):
             self._story.append(
@@ -135,10 +135,10 @@ class SimpleInvoice(SimpleDocTemplate):
             )
 
             self._story.append(
-                SimpleTable(self.__client_info_data(), horizontal_align='LEFT')
+                SimpleTable(self._client_info_data(), horizontal_align='LEFT')
             )
 
-    def __build_service_provider_and_client_info(self):
+    def _build_service_provider_and_client_info(self):
         if isinstance(self.service_provider_info, ServiceProviderInfo) and isinstance(self.client_info, ClientInfo):
             # Merge Table
             table_data = [
@@ -151,8 +151,8 @@ class SimpleInvoice(SimpleDocTemplate):
                 ('LINEBELOW', (3, 0), (4, 0), 1, colors.gray),
                 ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ]
-            client_info_data = self.__client_info_data()
-            service_provider_data = self.__service_provider_data()
+            client_info_data = self._client_info_data()
+            service_provider_data = self._service_provider_data()
             diff = abs(len(client_info_data) - len(service_provider_data))
             if diff > 0:
                 if len(client_info_data) < len(service_provider_data):
@@ -167,10 +167,10 @@ class SimpleInvoice(SimpleDocTemplate):
                 Table(table_data, style=table_style)
             )
         else:
-            self.__build_service_provider_info()
-            self.__build_client_info()
+            self._build_service_provider_info()
+            self._build_client_info()
 
-    def __build_items(self):
+    def _build_items(self):
         # Items
         item_data = []
         item_subtotal = 0
@@ -233,13 +233,13 @@ class SimpleInvoice(SimpleDocTemplate):
 
             self._story.append(TableWithHeader(item_data, horizontal_align='LEFT', style=style))
 
-    def __build_transactions(self):
+    def _build_transactions(self):
         # Transaction
         transaction_table_data = [
             (
                 t.transaction_id,
                 Paragraph(t.gateway, self._defined_styles.get('TableParagraph')),
-                self.__format_value(t.transaction_datetime),
+                self._format_value(t.transaction_datetime),
                 t.amount,
             ) for t in self._transactions if isinstance(t, Transaction)
         ]
@@ -251,7 +251,7 @@ class SimpleInvoice(SimpleDocTemplate):
             transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
             self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 
-    def __build_bottom_tip(self):
+    def _build_bottom_tip(self):
         if self._bottom_tip:
             self._story.append(Spacer(5, 5))
             self._story.append(
@@ -268,10 +268,10 @@ class SimpleInvoice(SimpleDocTemplate):
     def finish(self):
         self._story = []
 
-        self.__build_invoice_info()
-        self.__build_service_provider_and_client_info()
-        self.__build_items()
-        self.__build_transactions()
-        self.__build_bottom_tip()
+        self._build_invoice_info()
+        self._build_service_provider_and_client_info()
+        self._build_items()
+        self._build_transactions()
+        self._build_bottom_tip()
 
         self.build(self._story, onFirstPage=PaidStamp(7 * inch, 5.8 * inch) if self.is_paid else None)

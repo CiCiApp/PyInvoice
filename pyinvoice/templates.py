@@ -120,7 +120,7 @@ class SimpleInvoice(SimpleDocTemplate):
         # Merchant
         service_provider_info_data = self._service_provider_data()
         if service_provider_info_data:
-            self._story.append(Paragraph('Merchant', self._defined_styles.get('RightHeading1')))
+            self._story.append(Paragraph('Service Provider', self._defined_styles.get('RightHeading1')))
             self._story.append(SimpleTable(service_provider_info_data, horizontal_align='RIGHT'))
 
     def _client_info_data(self):

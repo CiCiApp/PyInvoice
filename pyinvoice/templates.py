@@ -93,18 +93,20 @@ class SimpleInvoice(SimpleDocTemplate):
 
         return data
 
-    def _build_invoice_info(self):
+    def _invoice_info_data(self):
         if isinstance(self.invoice_info, InvoiceInfo):
-            self._story.append(
-                Paragraph('Invoice', self._defined_styles.get('RightHeading1'))
-            )
-
             props = [('invoice_id', 'Invoice id'), ('invoice_datetime', 'Invoice date'),
                      ('due_datetime', 'Invoice due date')]
 
-            self._story.append(
-                SimpleTable(self._attribute_to_table_data(self.invoice_info, props), horizontal_align='RIGHT')
-            )
+            return self._attribute_to_table_data(self.invoice_info, props)
+
+        return []
+
+    def _build_invoice_info(self):
+        invoice_info_data = self._invoice_info_data()
+        if invoice_info_data:
+            self._story.append(Paragraph('Invoice', self._defined_styles.get('RightHeading1')))
+            self._story.append(SimpleTable(invoice_info_data, horizontal_align='RIGHT'))
 
     def _service_provider_data(self):
         props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),

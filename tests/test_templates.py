@@ -99,7 +99,7 @@ class TestSimpleInvoice(unittest.TestCase):
         self.assertTrue(os.path.exists(invoice_path))
 
     def test_only_items_with_tax_rate(self):
-        invoice_path = os.path.join(self.file_base_dir, 'only_items.pdf')
+        invoice_path = os.path.join(self.file_base_dir, 'only_items_with_tax.pdf')
         if os.path.exists(invoice_path):
             os.remove(invoice_path)
 
@@ -138,6 +138,35 @@ class TestSimpleInvoice(unittest.TestCase):
         self.assertEqual(item_data[-3][-1], Decimal('15.4'))  # subtotal
         self.assertEqual(item_data[-2][-1], Decimal('2.926'))  # tax
         self.assertEqual(item_data[-1][-1], Decimal('18.326'))  # total
+
+        invoice.finish()
+
+        self.assertTrue(os.path.exists(invoice_path))
+
+    def test_invoice_info(self):
+        invoice_path = os.path.join(self.file_base_dir, 'invoice_info.pdf')
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
+        invoice = SimpleInvoice(invoice_path)
+
+        # Before add invoice info
+        invoice_info_data = invoice._invoice_info_data()
+        self.assertEqual(invoice_info_data, [])
+
+        invoice.invoice_info = InvoiceInfo(12)
+
+        # After add invoice info
+        invoice_info_data = invoice._invoice_info_data()
+        self.assertEqual(len(invoice_info_data), 1)
+        self.assertEqual(invoice_info_data[0][0], 'Invoice id:')
+        self.assertEqual(invoice_info_data[0][1], 12)
+
+        invoice.invoice_info = InvoiceInfo(12, invoice_datetime=datetime(2015, 6, 1))
+        invoice_info_data = invoice._invoice_info_data()
+        self.assertEqual(len(invoice_info_data), 2)
+        self.assertEqual(invoice_info_data[1][0], 'Invoice date:')
+        self.assertEqual(invoice_info_data[1][1], '2015-06-01 00:00')
 
         invoice.finish()
 

@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 import os
 
-from setuptools import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:

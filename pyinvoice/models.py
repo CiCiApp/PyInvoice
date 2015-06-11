@@ -139,7 +139,7 @@ class Transaction(object):
         :param transaction_datetime:
         :type transaction_datetime: date or datetime or str or unicode
         :param amount: $$
-        :type amount: int or str or unicode
+        :type amount: int or float or str or unicode
         :return:
         """
         self.gateway = gateway

@@ -249,8 +249,7 @@ class SimpleInvoice(SimpleDocTemplate):
         if item_data:
             self._story.append(TableWithHeader(item_data, horizontal_align='LEFT', style=style))
 
-    def _build_transactions(self):
-        # Transaction
+    def _transactions_data(self):
         transaction_table_data = [
             (
                 t.transaction_id,
@@ -261,10 +260,16 @@ class SimpleInvoice(SimpleDocTemplate):
         ]
 
         if transaction_table_data:
-            self._story.append(
-                Paragraph('Transaction', self._defined_styles.get('Heading1'))
-            )
             transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
+
+        return transaction_table_data
+
+    def _build_transactions(self):
+        # Transaction
+        transaction_table_data = self._transactions_data()
+
+        if transaction_table_data:
+            self._story.append(Paragraph('Transaction', self._defined_styles.get('Heading1')))
             self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
 
     def _build_bottom_tip(self):

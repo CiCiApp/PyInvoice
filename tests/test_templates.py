@@ -252,3 +252,28 @@ class TestSimpleInvoice(unittest.TestCase):
         invoice.finish()
 
         self.assertTrue(os.path.exists(invoice_path))
+
+    def test_transaction(self):
+        invoice_path = os.path.join(self.file_base_dir, 'transaction.pdf')
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
+        invoice = SimpleInvoice(invoice_path)
+
+        transaction_data = invoice._transactions_data()
+        self.assertEqual(transaction_data, [])
+
+        invoice.add_transaction(Transaction('A', 1, date.today(), 9.9))
+        invoice.add_transaction(Transaction('B', 3, date(2015, 6, 1), 3.3))
+
+        transaction_data = invoice._transactions_data()
+        self.assertEqual(len(transaction_data), 3)
+        self.assertEqual(transaction_data[0][0], 'Transaction id')
+        self.assertEqual(transaction_data[1][3], 9.9)
+        self.assertEqual(transaction_data[2][0], 3)
+        self.assertEqual(transaction_data[2][2], '2015-06-01')
+        self.assertEqual(transaction_data[2][3], 3.3)
+
+        invoice.finish()
+
+        self.assertTrue(os.path.exists(invoice_path))

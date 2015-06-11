@@ -94,6 +94,14 @@ class TestSimpleInvoice(unittest.TestCase):
         self.assertEqual(item_data[-2][-1], Decimal('15.4'))  # subtotal
         self.assertEqual(item_data[-1][-1], Decimal('15.4'))  # total
 
+        # test style
+        # ## Subtotal
+        self.assertEqual(style[-4], ('SPAN', (0, 4), (3, 4)))
+        self.assertEqual(style[-3], ('ALIGN', (0, 4), (-2, -1), 'RIGHT'))
+        # ## Total
+        self.assertEqual(style[-2], ('SPAN', (0, 5), (3, 5)))
+        self.assertEqual(style[-1], ('ALIGN', (0, 5), (-2, -1), 'RIGHT'))
+
         invoice.finish()
 
         self.assertTrue(os.path.exists(invoice_path))

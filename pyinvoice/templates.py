@@ -8,7 +8,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, Spacer
-from reportlab.platypus.doctemplate import _doNothing
 
 from pyinvoice.components import SimpleTable, TableWithHeader, PaidStamp
 from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
@@ -125,26 +124,29 @@ class SimpleInvoice(SimpleDocTemplate):
             self._story.append(SimpleTable(service_provider_info_data, horizontal_align='RIGHT'))
 
     def _client_info_data(self):
+        if not isinstance(self.client_info, ClientInfo):
+            return []
+
         props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
                  ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
         return self._attribute_to_table_data(self.client_info, props)
 
     def _build_client_info(self):
         # ClientInfo
-        if isinstance(self.client_info, ClientInfo):
-            self._story.append(
-                Paragraph('Client', self._defined_styles.get('Heading1'))
-            )
-
-            self._story.append(
-                SimpleTable(self._client_info_data(), horizontal_align='LEFT')
-            )
+        client_info_data = self._client_info_data()
+        if client_info_data:
+            self._story.append(Paragraph('Client', self._defined_styles.get('Heading1')))
+            self._story.append(SimpleTable(client_info_data, horizontal_align='LEFT'))
 
     def _build_service_provider_and_client_info(self):
         if isinstance(self.service_provider_info, ServiceProviderInfo) and isinstance(self.client_info, ClientInfo):
             # Merge Table
             table_data = [
-                [Paragraph('Service Provider', self._defined_styles.get('Heading1')), '', '', Paragraph('Client', self._defined_styles.get('Heading1')), '']
+                [
+                    Paragraph('Service Provider', self._defined_styles.get('Heading1')), '',
+                    '',
+                    Paragraph('Client', self._defined_styles.get('Heading1')), ''
+                ]
             ]
             table_style = [
                 ('SPAN', (0, 0), (1, 0)),
@@ -288,4 +290,8 @@ class SimpleInvoice(SimpleDocTemplate):
         self._build_transactions()
         self._build_bottom_tip()
 
-        self.build(self._story, onFirstPage=PaidStamp(7 * inch, 5.8 * inch) if self.is_paid else _doNothing)
+        kwargs = {}
+        if self.is_paid:
+            kwargs['onFirstPage'] = PaidStamp(7 * inch, 5.8 * inch)
+
+        self.build(self._story, **kwargs)

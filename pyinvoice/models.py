@@ -92,7 +92,7 @@ class ClientInfo(AddressInfo):
         :type country: str or unicode or None
         :type post_code: str or unicode or None
         :type email: str or unicode or None
-        :type post_code: str or unicode or None
+        :type client_id: str or unicode or int or None
         """
         super(ClientInfo, self).__init__(name, street, city, state, country, post_code)
         self.email = email

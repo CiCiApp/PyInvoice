@@ -211,3 +211,44 @@ class TestSimpleInvoice(unittest.TestCase):
         invoice.finish()
 
         self.assertTrue(os.path.exists(invoice_path))
+
+    def test_client_info(self):
+        invoice_path = os.path.join(self.file_base_dir, 'client_info.pdf')
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
+        invoice = SimpleInvoice(invoice_path)
+
+        # Before add client info
+        info_data = invoice._client_info_data()
+        self.assertEqual(info_data, [])
+
+        # Empty info
+        invoice.client_info = ClientInfo()
+        info_data = invoice._client_info_data()
+        self.assertEqual(info_data, [])
+
+        invoice.client_info = ClientInfo(
+            name='Client ccc',
+            street='Street sss',
+            city='City ccc',
+            state='State sss',
+            country='Country ccc',
+            post_code='Post code ppp',
+            email='Email@example.com',
+            client_id=3214
+        )
+
+        # After add client info
+        info_data = invoice._client_info_data()
+        self.assertEqual(len(info_data), 8)
+        self.assertEqual(info_data[0][0], 'Name:')
+        self.assertEqual(info_data[0][1], 'Client ccc')
+        self.assertEqual(info_data[6][0], 'Email:')
+        self.assertEqual(info_data[6][1], 'Email@example.com')
+        self.assertEqual(info_data[7][0], 'Client id:')
+        self.assertEqual(info_data[7][1], 3214)
+
+        invoice.finish()
+
+        self.assertTrue(os.path.exists(invoice_path))

@@ -72,7 +72,7 @@ class ServiceProviderInfo(AddressInfo):
         :type state: str or unicode or None
         :type country: str or unicode or None
         :type post_code: str or unicode or None
-        :type vat_tax_number: str or unicode or None
+        :type vat_tax_number: str or unicode or int or None
         """
         super(ServiceProviderInfo, self).__init__(name, street, city, state, country, post_code)
         self.vat_tax_number = vat_tax_number

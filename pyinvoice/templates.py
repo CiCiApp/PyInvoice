@@ -109,21 +109,20 @@ class SimpleInvoice(SimpleDocTemplate):
             self._story.append(SimpleTable(invoice_info_data, horizontal_align='RIGHT'))
 
     def _service_provider_data(self):
-        props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                 ('country', 'Country'), ('post_code', 'Post code'), ('vat_tax_number', 'Vat/Tax number')]
+        if isinstance(self.service_provider_info, ServiceProviderInfo):
+            props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
+                     ('country', 'Country'), ('post_code', 'Post code'), ('vat_tax_number', 'Vat/Tax number')]
 
-        return self._attribute_to_table_data(self.service_provider_info, props)
+            return self._attribute_to_table_data(self.service_provider_info, props)
+
+        return []
 
     def _build_service_provider_info(self):
         # Merchant
-        if isinstance(self.service_provider_info, ServiceProviderInfo):
-            self._story.append(
-                Paragraph('Merchant', self._defined_styles.get('RightHeading1'))
-            )
-
-            self._story.append(
-                SimpleTable(self._service_provider_data(), horizontal_align='RIGHT')
-            )
+        service_provider_info_data = self._service_provider_data()
+        if service_provider_info_data:
+            self._story.append(Paragraph('Merchant', self._defined_styles.get('RightHeading1')))
+            self._story.append(SimpleTable(service_provider_info_data, horizontal_align='RIGHT'))
 
     def _client_info_data(self):
         props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),

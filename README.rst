@@ -7,6 +7,12 @@ PyInvoice
 
 Invoice/Receipt Generator.
 
+Screenshot
+----------
+
+.. image:: https://ciciapp.github.io/PyInvoice/dist/invoice.png
+    :target: https://github.com/CiCiApp/PyInvoice
+
 Dependency
 ----------
 * Reportlab
@@ -68,7 +74,7 @@ Usage
     doc.add_item(Item('Item', 'Item desc', 2, '2.2'))
     doc.add_item(Item('Item', 'Item desc', 3, '3.3'))
     
-    # Tax rate
+    # Tax rate, optional
     doc.set_item_tax_rate(20)  # 20%
     
     # Transactions detail, optional

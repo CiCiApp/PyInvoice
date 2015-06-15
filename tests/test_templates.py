@@ -45,7 +45,7 @@ class TestSimpleInvoice(unittest.TestCase):
         doc.set_item_tax_rate(20)  # 20%
 
         doc.add_transaction(Transaction('Paypal', 111, datetime.now(), 1))
-        doc.add_transaction(Transaction('Strip', 222, date.today(), 2))
+        doc.add_transaction(Transaction('Stripe', 222, date.today(), 2))
 
         transactions = doc.transactions
         self.assertEqual(len(transactions), 2)

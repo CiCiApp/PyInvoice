@@ -79,7 +79,7 @@ Usage
     
     # Transactions detail, optional
     doc.add_transaction(Transaction('Paypal', 111, datetime.now(), 1))
-    doc.add_transaction(Transaction('Strip', 222, date.today(), 2))
+    doc.add_transaction(Transaction('Stripe', 222, date.today(), 2))
     
     # Optional
     doc.set_bottom_tip("Email: example@example.com<br />Don't hesitate to contact us for any questions.")

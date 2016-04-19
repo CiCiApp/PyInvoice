@@ -192,6 +192,7 @@ class SimpleInvoice(SimpleDocTemplate):
                 )
             )
             item_subtotal += item.amount
+            item_subtotal = round(item_subtotal,2)
 
         return item_data, item_subtotal
 
@@ -226,6 +227,7 @@ class SimpleInvoice(SimpleDocTemplate):
         # Tax total
         if self._item_tax_rate is not None:
             tax_total = item_subtotal * (Decimal(str(self._item_tax_rate)) / Decimal('100'))
+            tax_total = round(tax_total,2)
             item_data.append(
                 ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', tax_total)
             )
@@ -237,6 +239,7 @@ class SimpleInvoice(SimpleDocTemplate):
 
         # Total
         total = item_subtotal + (tax_total if tax_total else Decimal('0'))
+        total = round(total,2)
         item_data.append(('Total', '', '', '', total))
         sum_start_y_index += 1
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))

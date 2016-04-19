@@ -193,8 +193,7 @@ class SimpleInvoice(SimpleDocTemplate):
             )
             item_subtotal += item.amount
 
-        rounditem_subtotal = round(item_subtotal,2)
-        return item_data, rounditem_subtotal
+        return item_data, item_subtotal
 
     def _item_data_and_style(self):
         # Items
@@ -217,8 +216,9 @@ class SimpleInvoice(SimpleDocTemplate):
         sum_start_x_index = len(item_data_title) - abs(sum_end_x_index)
 
         # ##### Subtotal #####
+        rounditem_subtotal = round(item_subtotal,2)
         item_data.append(
-            ('Subtotal', '', '', '', item_subtotal)
+            ('Subtotal', '', '', '', rounditem_subtotal)
         )
 
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))

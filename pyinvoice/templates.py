@@ -192,8 +192,8 @@ class SimpleInvoice(SimpleDocTemplate):
                 )
             )
             item_subtotal += item.amount
-            item_subtotal = round(item_subtotal,2)
 
+        item_subtotal = round(item_subtotal,2)
         return item_data, item_subtotal
 
     def _item_data_and_style(self):

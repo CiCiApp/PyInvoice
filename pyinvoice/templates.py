@@ -193,8 +193,8 @@ class SimpleInvoice(SimpleDocTemplate):
             )
             item_subtotal += item.amount
 
-        item_subtotal = round(item_subtotal,2)
-        return item_data, item_subtotal
+        rounditem_subtotal = round(item_subtotal,2)
+        return item_data, rounditem_subtotal
 
     def _item_data_and_style(self):
         # Items
@@ -227,9 +227,9 @@ class SimpleInvoice(SimpleDocTemplate):
         # Tax total
         if self._item_tax_rate is not None:
             tax_total = item_subtotal * (Decimal(str(self._item_tax_rate)) / Decimal('100'))
-            tax_total = round(tax_total,2)
+            roundtax_total = round(tax_total,2)
             item_data.append(
-                ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', tax_total)
+                ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', roundtax_total)
             )
             sum_start_y_index += 1
             style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
@@ -239,8 +239,8 @@ class SimpleInvoice(SimpleDocTemplate):
 
         # Total
         total = item_subtotal + (tax_total if tax_total else Decimal('0'))
-        total = round(total,2)
-        item_data.append(('Total', '', '', '', total))
+        roundtotal = round(total,2)
+        item_data.append(('Total', '', '', '', roundtotal))
         sum_start_y_index += 1
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
         style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))

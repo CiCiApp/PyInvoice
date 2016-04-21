@@ -15,8 +15,9 @@ from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServicePro
 
 class SimpleInvoice(SimpleDocTemplate):
     default_pdf_info = PDFInfo(title='Invoice', author='CiCiApp.com', subject='Invoice')
+    precision = None
 
-    def __init__(self, invoice_path, pdf_info=None):
+    def __init__(self, invoice_path, pdf_info=None, precision='0.01'):
         if not pdf_info:
             pdf_info = self.default_pdf_info
 
@@ -30,6 +31,8 @@ class SimpleInvoice(SimpleDocTemplate):
             bottomMargin=inch,
             **pdf_info.__dict__
         )
+
+        self.precision = precision
 
         self._defined_styles = getSampleStyleSheet()
         self._defined_styles.add(
@@ -216,8 +219,9 @@ class SimpleInvoice(SimpleDocTemplate):
         sum_start_x_index = len(item_data_title) - abs(sum_end_x_index)
 
         # ##### Subtotal #####
+        rounditem_subtotal = self.getroundeddecimal(item_subtotal, self.precision)
         item_data.append(
-            ('Subtotal', '', '', '', item_subtotal)
+            ('Subtotal', '', '', '', rounditem_subtotal)
         )
 
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
@@ -226,8 +230,9 @@ class SimpleInvoice(SimpleDocTemplate):
         # Tax total
         if self._item_tax_rate is not None:
             tax_total = item_subtotal * (Decimal(str(self._item_tax_rate)) / Decimal('100'))
+            roundtax_total = self.getroundeddecimal(tax_total, self.precision)
             item_data.append(
-                ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', tax_total)
+                ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', roundtax_total)
             )
             sum_start_y_index += 1
             style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
@@ -237,12 +242,19 @@ class SimpleInvoice(SimpleDocTemplate):
 
         # Total
         total = item_subtotal + (tax_total if tax_total else Decimal('0'))
-        item_data.append(('Total', '', '', '', total))
+        roundtotal = self.getroundeddecimal(total, self.precision)
+        item_data.append(('Total', '', '', '', roundtotal))
         sum_start_y_index += 1
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
         style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
 
         return item_data, style
+
+    def getroundeddecimal(self, nrtoround, precision):
+        d = Decimal(nrtoround)
+        aftercomma = Decimal(precision) # or anything that has the exponent depth you want
+        rvalue = Decimal(d.quantize(aftercomma, rounding='ROUND_HALF_UP'))
+        return rvalue
 
     def _build_items(self):
         item_data, style = self._item_data_and_style()

@@ -144,8 +144,8 @@ class TestSimpleInvoice(unittest.TestCase):
         item_data, style = invoice._item_data_and_style()
         self.assertEqual(len(item_data), 7)  # header, subtotal, tax, total
         self.assertEqual(item_data[-3][-1], Decimal('15.4'))  # subtotal
-        self.assertEqual(item_data[-2][-1], Decimal('2.926'))  # tax
-        self.assertEqual(item_data[-1][-1], Decimal('18.326'))  # total
+        self.assertEqual(item_data[-2][-1], Decimal('2.93'))  # tax
+        self.assertEqual(item_data[-1][-1], Decimal('18.33'))  # total
 
         invoice.finish()
 

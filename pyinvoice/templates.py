@@ -219,7 +219,6 @@ class SimpleInvoice(SimpleDocTemplate):
         sum_start_x_index = len(item_data_title) - abs(sum_end_x_index)
 
         # ##### Subtotal #####
-        Decimal.quantize()
         rounditem_subtotal = self.getroundeddecimal(item_subtotal,self.precision)
         item_data.append(
             ('Subtotal', '', '', '', rounditem_subtotal)

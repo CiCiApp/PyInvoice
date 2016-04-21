@@ -253,8 +253,8 @@ class SimpleInvoice(SimpleDocTemplate):
     def getroundeddecimal(self, nrtoround, precision):
         d = Decimal(nrtoround)
         aftercomma = Decimal(precision) # or anything that has the exponent depth you want
-        d.quantize(aftercomma, 'ROUND_HALF_UP')
-        return d
+        rvalue = Decimal(d.quantize(aftercomma, rounding='ROUND_HALF_UP'))
+        return rvalue
 
     def _build_items(self):
         item_data, style = self._item_data_and_style()

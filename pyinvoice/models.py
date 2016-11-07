@@ -83,7 +83,7 @@ class ClientInfo(AddressInfo):
     Client/Custom information
     """
     def __init__(self, name=None, street=None, city=None, state=None, country=None, post_code=None,
-                 email=None, client_id=None):
+                 email=None, client_id=None, nif=None):
         """
         :type name: str or unicode or None
         :type street: str or unicode or None
@@ -97,6 +97,7 @@ class ClientInfo(AddressInfo):
         super(ClientInfo, self).__init__(name, street, city, state, country, post_code)
         self.email = email
         self.client_id = client_id
+        self.nif = nif
 
 
 class Item(object):

@@ -130,8 +130,9 @@ class SimpleInvoice(SimpleDocTemplate):
         if not isinstance(self.client_info, ClientInfo):
             return []
 
-        props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                 ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
+        props = [('name', 'Name'), ('nif', 'NIF'), ('street', 'Street'), ('city', 'City'),
+                 ('state', 'State'), ('country', 'Country'), ('post_code', 'Post code'),
+                 ('email', 'Email'), ('client_id', 'Client id')]
         return self._attribute_to_table_data(self.client_info, props)
 
     def _build_client_info(self):

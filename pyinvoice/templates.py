@@ -10,11 +10,13 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, Spacer
 
 from pyinvoice.components import SimpleTable, TableWithHeader, PaidStamp
-from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, ServiceProviderInfo, ClientInfo
+from pyinvoice.models import PDFInfo, Item, Transaction, InvoiceInfo, \
+    ServiceProviderInfo, ClientInfo
 
 
 class SimpleInvoice(SimpleDocTemplate):
-    default_pdf_info = PDFInfo(title='Invoice', author='CiCiApp.com', subject='Invoice')
+    default_pdf_info = PDFInfo(
+        title='Invoice', author='CiCiApp.com', subject='Invoice')
     precision = None
 
     def __init__(self, invoice_path, pdf_info=None, precision='0.01'):
@@ -36,10 +38,14 @@ class SimpleInvoice(SimpleDocTemplate):
 
         self._defined_styles = getSampleStyleSheet()
         self._defined_styles.add(
-            ParagraphStyle('RightHeading1', parent=self._defined_styles.get('Heading1'), alignment=TA_RIGHT)
+            ParagraphStyle(
+                'RightHeading1', parent=self._defined_styles.get('Heading1'),
+                alignment=TA_RIGHT)
         )
         self._defined_styles.add(
-            ParagraphStyle('TableParagraph', parent=self._defined_styles.get('Normal'), alignment=TA_CENTER)
+            ParagraphStyle(
+                'TableParagraph', parent=self._defined_styles.get('Normal'),
+                alignment=TA_CENTER)
         )
 
         self.invoice_info = None
@@ -97,8 +103,10 @@ class SimpleInvoice(SimpleDocTemplate):
 
     def _invoice_info_data(self):
         if isinstance(self.invoice_info, InvoiceInfo):
-            props = [('invoice_id', 'Invoice id'), ('invoice_datetime', 'Invoice date'),
-                     ('due_datetime', 'Invoice due date')]
+            props = [
+                ('invoice_id', 'Invoice id'),
+                ('invoice_datetime', 'Invoice date'),
+                ('due_datetime', 'Invoice due date')]
 
             return self._attribute_to_table_data(self.invoice_info, props)
 
@@ -107,15 +115,29 @@ class SimpleInvoice(SimpleDocTemplate):
     def _build_invoice_info(self):
         invoice_info_data = self._invoice_info_data()
         if invoice_info_data:
-            self._story.append(Paragraph('Invoice', self._defined_styles.get('RightHeading1')))
-            self._story.append(SimpleTable(invoice_info_data, horizontal_align='RIGHT'))
+            self._story.append(
+                Paragraph(
+                    'Invoice',
+                    self._defined_styles.get('RightHeading1'))
+            )
+            self._story.append(
+                SimpleTable(invoice_info_data, horizontal_align='RIGHT'))
 
     def _service_provider_data(self):
         if isinstance(self.service_provider_info, ServiceProviderInfo):
-            props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                     ('country', 'Country'), ('post_code', 'Post code'), ('vat_tax_number', 'Vat/Tax number')]
+            props = [
+                ('name', 'Name'),
+                ('street', 'Street'),
+                ('po_box', 'P.O Box'),
+                ('private_bag', 'Private Bag'),
+                ('city', 'City'),
+                ('state', 'State'),
+                ('country', 'Country'),
+                ('post_code', 'Post code'),
+                ('vat_tax_number', 'Vat/Tax number')]
 
-            return self._attribute_to_table_data(self.service_provider_info, props)
+            return self._attribute_to_table_data(
+                self.service_provider_info, props)
 
         return []
 
@@ -123,32 +145,53 @@ class SimpleInvoice(SimpleDocTemplate):
         # Merchant
         service_provider_info_data = self._service_provider_data()
         if service_provider_info_data:
-            self._story.append(Paragraph('Service Provider', self._defined_styles.get('RightHeading1')))
-            self._story.append(SimpleTable(service_provider_info_data, horizontal_align='RIGHT'))
+            self._story.append(
+                Paragraph(
+                    'Service Provider',
+                    self._defined_styles.get('RightHeading1'))
+            )
+            self._story.append(
+                SimpleTable(
+                    service_provider_info_data, horizontal_align='RIGHT'))
 
     def _client_info_data(self):
         if not isinstance(self.client_info, ClientInfo):
             return []
 
-        props = [('name', 'Name'), ('street', 'Street'), ('city', 'City'), ('state', 'State'),
-                 ('country', 'Country'), ('post_code', 'Post code'), ('email', 'Email'), ('client_id', 'Client id')]
+        props = [
+            ('name', 'Name'),
+            ('street', 'Street'),
+            ('po_box', 'P.O Box'),
+            ('private_bag', 'Private Bag'),
+            ('city', 'City'),
+            ('state', 'State'),
+            ('country', 'Country'),
+            ('post_code', 'Post code'),
+            ('email', 'Email'),
+            ('client_id', 'Client id')
+        ]
         return self._attribute_to_table_data(self.client_info, props)
 
     def _build_client_info(self):
         # ClientInfo
         client_info_data = self._client_info_data()
         if client_info_data:
-            self._story.append(Paragraph('Client', self._defined_styles.get('Heading1')))
-            self._story.append(SimpleTable(client_info_data, horizontal_align='LEFT'))
+            self._story.append(
+                Paragraph('Client', self._defined_styles.get('Heading1')))
+            self._story.append(
+                SimpleTable(client_info_data, horizontal_align='LEFT'))
 
     def _build_service_provider_and_client_info(self):
-        if isinstance(self.service_provider_info, ServiceProviderInfo) and isinstance(self.client_info, ClientInfo):
+        if isinstance(self.service_provider_info, ServiceProviderInfo) and \
+                isinstance(self.client_info, ClientInfo):
             # Merge Table
             table_data = [
                 [
-                    Paragraph('Service Provider', self._defined_styles.get('Heading1')), '',
-                    '',
-                    Paragraph('Client', self._defined_styles.get('Heading1')), ''
+                    Paragraph(
+                        'Service Provider',
+                        self._defined_styles.get('Heading1')), '', '',
+                    Paragraph('Client', self._defined_styles.get('Heading1')),
+                    ''
                 ]
             ]
             table_style = [
@@ -163,9 +206,9 @@ class SimpleInvoice(SimpleDocTemplate):
             diff = abs(len(client_info_data) - len(service_provider_data))
             if diff > 0:
                 if len(client_info_data) < len(service_provider_data):
-                    client_info_data.extend([["", ""]]*diff)
+                    client_info_data.extend([["", ""]] * diff)
                 else:
-                    service_provider_data.extend([["", ""]*diff])
+                    service_provider_data.extend([["", ""] * diff])
             for d in zip(service_provider_data, client_info_data):
                 d[0].append('')
                 d[0].extend(d[1])
@@ -188,7 +231,9 @@ class SimpleInvoice(SimpleDocTemplate):
             item_data.append(
                 (
                     item.name,
-                    Paragraph(item.description, self._defined_styles.get('TableParagraph')),
+                    Paragraph(
+                        item.description,
+                        self._defined_styles.get('TableParagraph')),
                     item.units,
                     item.unit_price,
                     item.amount
@@ -210,7 +255,8 @@ class SimpleInvoice(SimpleDocTemplate):
             Paragraph('Detail', self._defined_styles.get('Heading1'))
         )
 
-        item_data_title = ('Name', 'Description', 'Units', 'Unit Price', 'Amount')
+        item_data_title = (
+            'Name', 'Description', 'Units', 'Unit Price', 'Amount')
         item_data.insert(0, item_data_title)  # Insert title
 
         # Summary field
@@ -219,24 +265,41 @@ class SimpleInvoice(SimpleDocTemplate):
         sum_start_x_index = len(item_data_title) - abs(sum_end_x_index)
 
         # ##### Subtotal #####
-        rounditem_subtotal = self.getroundeddecimal(item_subtotal, self.precision)
+        rounditem_subtotal = self.getroundeddecimal(
+            item_subtotal, self.precision)
         item_data.append(
             ('Subtotal', '', '', '', rounditem_subtotal)
         )
 
-        style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
-        style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
+        style.append((
+            'SPAN',
+            (0, sum_start_y_index),
+            (sum_start_x_index, sum_start_y_index)))
+        style.append((
+            'ALIGN',
+            (0, sum_start_y_index),
+            (sum_end_x_index, -1),
+            'RIGHT'))
 
         # Tax total
         if self._item_tax_rate is not None:
-            tax_total = item_subtotal * (Decimal(str(self._item_tax_rate)) / Decimal('100'))
+            tax_total = item_subtotal * \
+                (Decimal(str(self._item_tax_rate)) / Decimal('100'))
             roundtax_total = self.getroundeddecimal(tax_total, self.precision)
             item_data.append(
-                ('Vat/Tax ({0}%)'.format(self._item_tax_rate), '', '', '', roundtax_total)
+                ('Vat/Tax ({0}%)'.format(self._item_tax_rate),
+                 '', '', '', roundtax_total)
             )
             sum_start_y_index += 1
-            style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
-            style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
+            style.append((
+                'SPAN',
+                (0, sum_start_y_index),
+                (sum_start_x_index, sum_start_y_index)))
+            style.append((
+                'ALIGN',
+                (0, sum_start_y_index),
+                (sum_end_x_index, -1),
+                'RIGHT'))
         else:
             tax_total = None
 
@@ -245,34 +308,44 @@ class SimpleInvoice(SimpleDocTemplate):
         roundtotal = self.getroundeddecimal(total, self.precision)
         item_data.append(('Total', '', '', '', roundtotal))
         sum_start_y_index += 1
-        style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
-        style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
+        style.append((
+            'SPAN',
+            (0, sum_start_y_index),
+            (sum_start_x_index, sum_start_y_index)))
+        style.append((
+            'ALIGN',
+            (0, sum_start_y_index),
+            (sum_end_x_index, -1),
+            'RIGHT'))
 
         return item_data, style
 
     def getroundeddecimal(self, nrtoround, precision):
         d = Decimal(nrtoround)
-        aftercomma = Decimal(precision) # or anything that has the exponent depth you want
+        aftercomma = Decimal(precision)
         rvalue = Decimal(d.quantize(aftercomma, rounding='ROUND_HALF_UP'))
         return rvalue
 
     def _build_items(self):
         item_data, style = self._item_data_and_style()
         if item_data:
-            self._story.append(TableWithHeader(item_data, horizontal_align='LEFT', style=style))
+            self._story.append(TableWithHeader(
+                item_data, horizontal_align='LEFT', style=style))
 
     def _transactions_data(self):
         transaction_table_data = [
             (
                 t.transaction_id,
-                Paragraph(t.gateway, self._defined_styles.get('TableParagraph')),
+                Paragraph(
+                    t.gateway, self._defined_styles.get('TableParagraph')),
                 self._format_value(t.transaction_datetime),
                 t.amount,
             ) for t in self._transactions if isinstance(t, Transaction)
         ]
 
         if transaction_table_data:
-            transaction_table_data.insert(0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
+            transaction_table_data.insert(
+                0, ('Transaction id', 'Gateway', 'Transaction date', 'Amount'))
 
         return transaction_table_data
 
@@ -281,8 +354,10 @@ class SimpleInvoice(SimpleDocTemplate):
         transaction_table_data = self._transactions_data()
 
         if transaction_table_data:
-            self._story.append(Paragraph('Transaction', self._defined_styles.get('Heading1')))
-            self._story.append(TableWithHeader(transaction_table_data, horizontal_align='LEFT'))
+            self._story.append(
+                Paragraph('Transaction', self._defined_styles.get('Heading1')))
+            self._story.append(TableWithHeader(
+                transaction_table_data, horizontal_align='LEFT'))
 
     def _build_bottom_tip(self):
         if self._bottom_tip:

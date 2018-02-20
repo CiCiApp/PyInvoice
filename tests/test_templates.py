@@ -180,6 +180,92 @@ class TestSimpleInvoice(unittest.TestCase):
 
         self.assertTrue(os.path.exists(invoice_path))
 
+    def test_service_provider_info_pobox(self):
+        invoice_path = os.path.join(
+            self.file_base_dir, 'service_provider_info_pobox.pdf')
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
+        invoice = SimpleInvoice(invoice_path)
+
+        # Before add service provider info
+        info_data = invoice._service_provider_data()
+        self.assertEqual(info_data, [])
+
+        # Empty info
+        invoice.service_provider_info = ServiceProviderInfo()
+        info_data = invoice._service_provider_data()
+        self.assertEqual(info_data, [])
+
+        invoice.service_provider_info = ServiceProviderInfo(
+            name='CiCiApp',
+            po_box='1037',
+            city='City ccc',
+            state='State sss',
+            country='Country rrr',
+            post_code='Post code ppp',
+            vat_tax_number=666
+        )
+
+        # After add service provider info
+        info_data = invoice._service_provider_data()
+        self.assertEqual(len(info_data), 7)
+        self.assertEqual(info_data[0][0], 'Name:')
+        self.assertEqual(info_data[0][1], 'CiCiApp')
+        self.assertEqual(info_data[1][0], 'P.O Box:')
+        self.assertEqual(info_data[1][1], '1037')
+        self.assertEqual(info_data[4][0], 'Country:')
+        self.assertEqual(info_data[4][1], 'Country rrr')
+        self.assertEqual(info_data[6][0], 'Vat/Tax number:')
+        self.assertEqual(info_data[6][1], 666)
+
+        invoice.finish()
+
+        self.assertTrue(os.path.exists(invoice_path))
+
+    def test_service_provider_info_pbag(self):
+        invoice_path = os.path.join(
+            self.file_base_dir, 'service_provider_info_pbag.pdf')
+        if os.path.exists(invoice_path):
+            os.remove(invoice_path)
+
+        invoice = SimpleInvoice(invoice_path)
+
+        # Before add service provider info
+        info_data = invoice._service_provider_data()
+        self.assertEqual(info_data, [])
+
+        # Empty info
+        invoice.service_provider_info = ServiceProviderInfo()
+        info_data = invoice._service_provider_data()
+        self.assertEqual(info_data, [])
+
+        invoice.service_provider_info = ServiceProviderInfo(
+            name='CiCiApp',
+            private_bag='1037',
+            city='City ccc',
+            state='State sss',
+            country='Country rrr',
+            post_code='Post code ppp',
+            vat_tax_number=666
+        )
+
+        # After add service provider info
+        info_data = invoice._service_provider_data()
+        self.assertEqual(len(info_data), 7)
+        self.assertEqual(info_data[0][0], 'Name:')
+        self.assertEqual(info_data[0][1], 'CiCiApp')
+        self.assertEqual(info_data[1][0], 'Private Bag:')
+        self.assertEqual(info_data[1][1], '1037')
+        self.assertEqual(info_data[4][0], 'Country:')
+        self.assertEqual(info_data[4][1], 'Country rrr')
+        self.assertEqual(info_data[6][0], 'Vat/Tax number:')
+        self.assertEqual(info_data[6][1], 666)
+
+        invoice.finish()
+
+        self.assertTrue(os.path.exists(invoice_path))
+
     def test_service_provider_info(self):
         invoice_path = os.path.join(self.file_base_dir, 'service_provider_info.pdf')
         if os.path.exists(invoice_path):

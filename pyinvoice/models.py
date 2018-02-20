@@ -26,7 +26,8 @@ class InvoiceInfo(object):
     """
     Invoice information
     """
-    def __init__(self, invoice_id=None, invoice_datetime=None, due_datetime=None):
+    def __init__(
+            self, invoice_id=None, invoice_datetime=None, due_datetime=None):
         """
         Invoice info
         :param invoice_id: Invoice id
@@ -42,10 +43,16 @@ class InvoiceInfo(object):
 
 
 class AddressInfo(object):
-    def __init__(self, name=None, street=None, city=None, state=None, country=None, post_code=None):
+    def __init__(
+            self, name=None, street=None,
+            po_box=None, private_bag=None,
+            city=None, state=None,
+            country=None, post_code=None):
         """
         :type name: str or unicode or None
         :type street: str or unicode or None
+        :type po_box: str or unicode or None
+        :type private_bag: str or unicode or None
         :type city: str or unicode or None
         :type state: str or unicode or None
         :type country: str or unicode or None
@@ -53,6 +60,8 @@ class AddressInfo(object):
         """
         self.name = name
         self.street = street
+        self.po_box = po_box
+        self.private_bag = private_bag
         self.city = city
         self.state = state
         self.country = country
@@ -63,18 +72,26 @@ class ServiceProviderInfo(AddressInfo):
     """
     Service provider/Merchant information
     """
-    def __init__(self, name=None, street=None, city=None, state=None, country=None, post_code=None,
-                 vat_tax_number=None):
+    def __init__(
+            self, name=None, street=None,
+            po_box=None, private_bag=None,
+            city=None, state=None, country=None,
+            post_code=None,
+            vat_tax_number=None):
         """
         :type name: str or unicode or None
         :type street: str or unicode or None
+        :type po_box: str or unicode or None
+        :type private_bag: str or unicode or None
         :type city: str or unicode or None
         :type state: str or unicode or None
         :type country: str or unicode or None
         :type post_code: str or unicode or None
         :type vat_tax_number: str or unicode or int or None
         """
-        super(ServiceProviderInfo, self).__init__(name, street, city, state, country, post_code)
+        super(ServiceProviderInfo, self).__init__(
+            name, street, po_box, private_bag, city,
+            state, country, post_code)
         self.vat_tax_number = vat_tax_number
 
 
@@ -82,11 +99,16 @@ class ClientInfo(AddressInfo):
     """
     Client/Custom information
     """
-    def __init__(self, name=None, street=None, city=None, state=None, country=None, post_code=None,
-                 email=None, client_id=None):
+    def __init__(
+            self, name=None, street=None,
+            po_box=None, private_bag=None,
+            city=None, state=None, country=None,
+            post_code=None, email=None, client_id=None):
         """
         :type name: str or unicode or None
         :type street: str or unicode or None
+        :type po_box: str or unicode or None
+        :type private_bag: str or unicode or None
         :type city: str or unicode or None
         :type state: str or unicode or None
         :type country: str or unicode or None
@@ -94,7 +116,9 @@ class ClientInfo(AddressInfo):
         :type email: str or unicode or None
         :type client_id: str or unicode or int or None
         """
-        super(ClientInfo, self).__init__(name, street, city, state, country, post_code)
+        super(ClientInfo, self).__init__(
+            name, street, po_box, private_bag,
+            city, state, country, post_code)
         self.email = email
         self.client_id = client_id
 

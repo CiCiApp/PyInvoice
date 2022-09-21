@@ -190,8 +190,8 @@ class SimpleInvoice(SimpleDocTemplate):
                     item.name,
                     Paragraph(item.description, self._defined_styles.get('TableParagraph')),
                     item.units,
-                    item.unit_price,
-                    item.amount
+                    "%s €" % (item.unit_price),
+                    "%.2f €" % (item.amount),
                 )
             )
             item_subtotal += item.amount
@@ -221,7 +221,7 @@ class SimpleInvoice(SimpleDocTemplate):
         # ##### Subtotal #####
         rounditem_subtotal = self.getroundeddecimal(item_subtotal, self.precision)
         item_data.append(
-            ('Subtotal', '', '', '', rounditem_subtotal)
+            ('Subtotal', '', '', '', "%.2f €" % rounditem_subtotal)
         )
 
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
@@ -243,7 +243,7 @@ class SimpleInvoice(SimpleDocTemplate):
         # Total
         total = item_subtotal + (tax_total if tax_total else Decimal('0'))
         roundtotal = self.getroundeddecimal(total, self.precision)
-        item_data.append(('Total', '', '', '', roundtotal))
+        item_data.append(('Total', '', '', '', "%.2f €" % roundtotal))
         sum_start_y_index += 1
         style.append(('SPAN', (0, sum_start_y_index), (sum_start_x_index, sum_start_y_index)))
         style.append(('ALIGN', (0, sum_start_y_index), (sum_end_x_index, -1), 'RIGHT'))
